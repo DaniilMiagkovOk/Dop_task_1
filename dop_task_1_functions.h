@@ -59,8 +59,6 @@ void print_all_teams(vector <vector < Character >>& teams);
 
 void find_winner_team(vector <vector < Character >>& teams, vector < Character >& enemy_team);
 
-unsigned short find_max_in_vector(vector < Character > characters);
-
 bool all_equal_to_zero(vector<Character>& team, string parametr);
 
 void decrease_health(vector < Character >& team_1, vector < Character >& team_2, vector < Character > team_const);

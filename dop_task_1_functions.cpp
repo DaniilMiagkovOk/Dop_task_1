@@ -481,6 +481,7 @@ void print_all_teams(vector <vector < Character >>& teams)
 void find_winner_solo(vector < Character >& characters, Character character_enemy)
 {
     int time;
+    vector < Character > answer;
     Character character_enemy_fantom, character_fantom;
     for (int i = 0; i < characters.size(); i++)
     {
@@ -535,31 +536,28 @@ void find_winner_solo(vector < Character >& characters, Character character_enem
                 }
 
             }
-            cout << "time = " << setw(5) << time << endl;
+            //cout << "time = " << setw(5) << time << endl;
 
             characters[i].time_fight = time;
             character_fantom.time_fight = time;
             character_fantom.health -= character_enemy_fantom.damage;
             character_enemy_fantom.health -= character_fantom.damage;
-            print_line(character_fantom);
-            print_line(character_enemy_fantom);
-            cout << endl;
+            //print_line(character_fantom);
+            //print_line(character_enemy_fantom);
+            //cout << endl;
 
         }
-        if (character_fantom.health - character_enemy_fantom.damage <= 0)
+        if (character_fantom.health - character_enemy_fantom.damage > 0)
         {
-            characters.erase(characters.begin() + i);
-            i--;
-        }
-        else
-        {
-            characters[i].percent = character_fantom.health / characters[i].health;
-            characters[i].health = character_fantom.health;
+            character_fantom.percent = character_fantom.health / characters[i].health;
+            answer.push_back(character_fantom);
         }
     }
+    characters = answer;
 }
 
 //нахождение массива комманд 
+//сочетания из количества персонажей по три
 void find_array_team(int last, vector < Character >& team, vector <vector < Character >>& teams, vector < Character >& characters)
 {
     if (team.size() == 3)
@@ -572,18 +570,6 @@ void find_array_team(int last, vector < Character >& team, vector <vector < Char
         find_array_team(index, team, teams, characters);
         team.pop_back();
     }
-}
-
-//нахождение персонажа с максимальной силой
-unsigned short find_max_in_vector(vector < Character > characters)
-{
-    unsigned short max_index = 0;
-    for (int i = 0; i < characters.size(); i++)
-    {
-        if (characters[i].damage > max_index)
-            max_index = i;
-    }
-    return max_index;
 }
 
 //проверка на все нули
@@ -644,19 +630,20 @@ bool print_or_not_print()
     }
 }
 
-//нахождение комманд которые победили
+//нахождение команд которые победили
 void find_winner_team(vector <vector < Character >>& teams, vector < Character >& team_enemy)
 {
     int time;
      
-    //Team team_fantom, team_enemy_fantom;
+    vector <vector < Character >> answer;
+
     vector < Character >
         team_fantom,
         team_fantom_enemy;
 
     
     bool p_o_n_p = print_or_not_print();
-    cout << "Какое количество комманд посмотреть: ";
+    cout << "Какое количество команд посмотреть: ";
     int count_teams = input_value(0);
     Point B = cursor_position();
 
@@ -666,7 +653,10 @@ void find_winner_team(vector <vector < Character >>& teams, vector < Character >
         team_fantom = teams[i];
         team_fantom_enemy = team_enemy;
         
-        cout << "Команда с номером " << i << endl;
+        if (i < count_teams)
+        {
+            cout << "Команда с номером " << i << endl;
+        }
         Point A = cursor_position();
         while (true)
         {
@@ -716,7 +706,6 @@ void find_winner_team(vector <vector < Character >>& teams, vector < Character >
                                 break;
                             if (!team_fantom_enemy[k].die)
                                 team_fantom_enemy[k].damage = 0;
-                            //team_enemy_fantom[find_max_in_vector(team_enemy_fantom)].damage = 0;
                         }
                         team_fantom[j].interval = teams[i][j].interval;
                     }
@@ -752,7 +741,7 @@ void find_winner_team(vector <vector < Character >>& teams, vector < Character >
             if (p_o_n_p == 1)
                 print_teams(team_fantom, team_fantom_enemy);
 
-            for (int j = 0; j < team_fantom_enemy.size(); j++) //перебираем всех в нашей команде
+            for (int j = 0; j < team_fantom_enemy.size(); j++) //перебираем всех в противника команде
             {
                 if (all_equal_to_zero(team_fantom, "damage"))
                 {
@@ -820,7 +809,6 @@ void find_winner_team(vector <vector < Character >>& teams, vector < Character >
             decrease_health( team_fantom, team_fantom_enemy, team_enemy);
             decrease_health( team_fantom_enemy, team_fantom, teams[i]);
 
-
             for (int j = 0; j < team_fantom.size(); j++)
             {
                 if (!team_fantom[j].die)
@@ -845,23 +833,31 @@ void find_winner_team(vector <vector < Character >>& teams, vector < Character >
                 print_teams(team_fantom, team_fantom_enemy);
                 Sleep(3000);
             }
-            teams.erase(teams.begin() + i);
-            
             erase_past_output(B);
         }
         else
-        {     
+        {    
+            for(int k = 0; k < teams[i].size(); k++)
+            {
+                if (!team_fantom[k].die)
+                {
+                    team_fantom[k].damage = teams[i][k].damage;
+                    team_fantom[k].time = teams[i][k].time;
+                    team_fantom[k].interval = teams[i][k].interval;
+                }
+            }
             if (i < count_teams)
             {
                 cout << "Победили мы ;)" << endl;
                 print_teams(team_fantom, team_fantom_enemy);
                 Sleep(3000);
             }                
-            teams[i] = team_fantom;
+            answer.push_back(team_fantom);
             erase_past_output(B);
 
         }
     }
+    teams = answer;
 }
 
 //уменьшение здоровья
